@@ -24,10 +24,12 @@ var (
 	}
 )
 
+// Destroy the terraform code
 func destroyTerraform(t *testing.T) {
 	terraform.Destroy(t, opts)
 }
 
+// Deploy the terraform code
 func deployTerraform(t *testing.T) {
 	_, err := terraform.InitAndApplyE(t, opts)
 	if err != nil {
@@ -35,6 +37,7 @@ func deployTerraform(t *testing.T) {
 	}
 }
 
+// Verify the names of the S3 bucket and DynamoDB table created by the red backend
 func verifyRedBackendNames(t *testing.T) {
 	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
 	tableName := terraform.Output(t, opts, "red_backend_ddb_table")
@@ -47,6 +50,7 @@ func verifyRedBackendNames(t *testing.T) {
 	assert.Equal(t, expectedBucketName, bucketName)
 }
 
+// Test the red backend terraform module
 func TestRedBackend(t *testing.T) {
 	defer test_structure.RunTestStage(t, "terraform_destroy", func() {
 		destroyTerraform(t)

@@ -1,6 +1,6 @@
 # Red Backend
 
-A simple remote backend modules for AWS Terraform creations.
+A simple remote backend module for AWS Terraform creations.
 
 <!-- prettier-ignore-start -->
 <!-- BEGIN_TF_DOCS -->
