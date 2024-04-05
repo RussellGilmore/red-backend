@@ -1,21 +1,15 @@
 # Red Backend Module Testing Workflow
 name: Testing Red Backend Module
-
 on:
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     steps:
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
@@ -31,5 +25,9 @@ jobs:
         working-directory: tests/
         run: go get -v -t -d && go mod tidy
       - name: Test
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         working-directory: tests/
         run: go test -timeout 10m red_backend_test.go -v
