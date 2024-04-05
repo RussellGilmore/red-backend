@@ -1,5 +1,7 @@
 # Red Backend
 
+## [![Red Backend Module](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml/badge.svg?branch=main)](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml)
+
 A simple remote backend module for AWS Terraform creations.
 
 <!-- prettier-ignore-start -->
