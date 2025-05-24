@@ -31,3 +31,12 @@ repos:
         name: Pretty Markdown
         args: [--prose-wrap=always]
         types_or: [markdown, yaml]
+  - repo: https://github.com/aquasecurity/tfsec
+    rev: v1.28.14
+    hooks:
+      - id: tfsec
+        name: Terraform Security Checker
+        args:
+          - --soft-fail # Don't fail on warnings
+          - --format=json # Output format
+        files: \.tf$
