@@ -1,5 +1,12 @@
 # Red Backend
 
+**Requirements:**
+
+1. Terraform 1.12.1
+2. Trivy
+
+[![Red Backend Module](
+
 ## [![Red Backend Module](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml/badge.svg?branch=main)](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml)
 
 A simple remote backend module for AWS Terraform creations.
