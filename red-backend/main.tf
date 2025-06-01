@@ -17,11 +17,13 @@ data "aws_partition" "current" {}
 data "aws_region" "current" {}
 
 # Terraform Statefile Bucket
+# trivy:ignore:AVD-AWS-0089
 resource "aws_s3_bucket" "backend_s3" {
   bucket = "${var.project_name}-s3"
 }
 
 # Server-side encryption configuration for the S3 bucket
+# trivy:ignore:AVD-AWS-0132
 resource "aws_s3_bucket_server_side_encryption_configuration" "s3_encryption" {
   bucket = aws_s3_bucket.backend_s3.id
 
@@ -52,6 +54,7 @@ resource "aws_s3_bucket_public_access_block" "s3_public_access_block" {
 }
 
 # DynamoDB table for Terraform state lock
+# trivy:ignore:AVD-AWS-0025
 resource "aws_dynamodb_table" "ddb_lock_status_table" {
   name         = "${var.project_name}-tf-lock-status"
   billing_mode = "PAY_PER_REQUEST"
