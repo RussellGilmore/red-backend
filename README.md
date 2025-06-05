@@ -3,7 +3,7 @@
 **Requirements:**
 
 1. Terraform 1.12.1
-2. Trivy
+2. Trivy 0.63.0
 
 [![Red Backend Module](
 
