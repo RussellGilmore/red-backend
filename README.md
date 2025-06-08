@@ -5,7 +5,11 @@
 1. Terraform 1.12.1
 2. Trivy 0.63.0
 
-[![Red Backend Module](
+Trivy can be installed via Homebrew on macOS with the command:
+
+```bash
+brew install aquasecurity/trivy/trivy
+```
 
 ## [![Red Backend Module](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml/badge.svg?branch=main)](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml)
 
