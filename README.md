@@ -38,7 +38,6 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_dynamodb_table.ddb_lock_status_table](https://registry.terraform.io/providers/hashicorp/aws/6.0.0-beta1/docs/resources/dynamodb_table) | resource |
 | [aws_iam_policy.s3_ddb_policy](https://registry.terraform.io/providers/hashicorp/aws/6.0.0-beta1/docs/resources/iam_policy) | resource |
 | [aws_s3_bucket.backend_s3](https://registry.terraform.io/providers/hashicorp/aws/6.0.0-beta1/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket_public_access_block.s3_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/6.0.0-beta1/docs/resources/s3_bucket_public_access_block) | resource |
