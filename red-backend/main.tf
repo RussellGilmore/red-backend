@@ -53,31 +53,10 @@ resource "aws_s3_bucket_public_access_block" "s3_public_access_block" {
   restrict_public_buckets = true
 }
 
-# DynamoDB table for Terraform state lock
-# trivy:ignore:AVD-AWS-0025
-resource "aws_dynamodb_table" "ddb_lock_status_table" {
-  name         = "${var.project_name}-tf-lock-status"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-
-  server_side_encryption {
-    enabled = true
-  }
-
-  point_in_time_recovery {
-    enabled = true
-  }
-}
-
-# IAM policy to access the S3 bucket and DynamoDB table
+# IAM policy to access the S3 bucket
 resource "aws_iam_policy" "s3_ddb_policy" {
   name        = "${var.project_name}-Backend-Resource-Policy"
-  description = "IAM policy to access the S3 bucket and DynamoDB table"
+  description = "IAM policy to access the S3 bucket"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -94,16 +73,6 @@ resource "aws_iam_policy" "s3_ddb_policy" {
           "s3:PutObject"
         ]
         Resource = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.backend_s3.id}/*"]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "dynamodb:DescribeTable",
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:DeleteItem"
-        ]
-        Resource = ["arn:${data.aws_partition.current.partition}:dynamodb:*:*:table/${aws_dynamodb_table.ddb_lock_status_table.id}"]
-    }]
+    }, ]
   })
 }
