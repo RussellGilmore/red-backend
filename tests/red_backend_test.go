@@ -40,12 +40,8 @@ func deployTerraform(t *testing.T) {
 // Verify the names of the S3 bucket and DynamoDB table created by the red backend
 func verifyRedBackendNames(t *testing.T) {
 	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
-	tableName := terraform.Output(t, opts, "red_backend_ddb_table")
 
 	expectedBucketName := projectName + "-s3"
-	expectedTableName := projectName + "-tf-lock-status"
-
-	assert.Equal(t, expectedTableName, tableName)
 
 	assert.Equal(t, expectedBucketName, bucketName)
 }

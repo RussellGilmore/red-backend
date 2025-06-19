@@ -53,7 +53,7 @@ resource "aws_s3_bucket_public_access_block" "s3_public_access_block" {
   restrict_public_buckets = true
 }
 
-# IAM policy to access the S3 bucket
+# IAM policy to access the S3 bucket with S3 native locking support
 resource "aws_iam_policy" "s3_ddb_policy" {
   name        = "${var.project_name}-Backend-Resource-Policy"
   description = "IAM policy to access the S3 bucket"
@@ -73,6 +73,21 @@ resource "aws_iam_policy" "s3_ddb_policy" {
           "s3:PutObject"
         ]
         Resource = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.backend_s3.id}/*"]
-    }, ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = ["arn:${data.aws_partition.current.partition}:s3:::${aws_s3_bucket.backend_s3.id}/*.tflock"]
+        Condition = {
+          StringEquals = {
+            "s3:ExistingObjectTag/terraform-lock" = "true"
+          }
+        }
+      }
+    ]
   })
 }
