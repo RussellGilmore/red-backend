@@ -3,6 +3,9 @@ module module/red-backend
 go 1.24
 
 require (
+	github.com/aws/aws-sdk-go-v2 v1.32.6            // For your custom AWS operations
+	github.com/aws/aws-sdk-go-v2/config v1.28.6     // For v2 config
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.71.0 // For v2 S3 operations
 	github.com/gruntwork-io/terratest v0.49.0
 	github.com/stretchr/testify v1.10.0
 )
