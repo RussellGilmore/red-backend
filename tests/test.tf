@@ -20,7 +20,12 @@ output "red_backend_s3_bucket" {
   description = "The S3 bucket for storing Terraform state files"
 }
 
-output "red_backend_ddb_table" {
-  value       = module.red-backend.red_backend_ddb_table
-  description = "The DynamoDB table for storing Terraform state lock status"
+output "backend_configuration" {
+  description = "Backend configuration block for use in other Terraform configurations"
+  value       = module.red-backend.backend_configuration
+}
+
+output "example_backend_config" {
+  description = "Example backend configuration to copy into your terraform block"
+  value       = module.red-backend.example_backend_config
 }

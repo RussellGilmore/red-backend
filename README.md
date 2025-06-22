@@ -60,7 +60,6 @@ No modules.
 |------|-------------|
 | <a name="output_backend_configuration"></a> [backend\_configuration](#output\_backend\_configuration) | Backend configuration block for use in other Terraform configurations |
 | <a name="output_example_backend_config"></a> [example\_backend\_config](#output\_example\_backend\_config) | Example backend configuration to copy into your terraform block |
-| <a name="output_red_backend_ddb_table"></a> [red\_backend\_ddb\_table](#output\_red\_backend\_ddb\_table) | The DynamoDB table for storing Terraform state lock status |
 | <a name="output_red_backend_s3_bucket"></a> [red\_backend\_s3\_bucket](#output\_red\_backend\_s3\_bucket) | The S3 bucket for storing Terraform state files |
 <!-- END_TF_DOCS -->
 <!-- prettier-ignore-end -->
