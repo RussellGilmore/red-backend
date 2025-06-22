@@ -33,6 +33,89 @@ var (
 	}
 )
 
+// Empty the S3 bucket before destruction (required for versioned buckets)
+func emptyS3Bucket(t *testing.T) {
+	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
+
+	// Create AWS SDK v2 client
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(awsRegion))
+	require.NoError(t, err, "Failed to load AWS config")
+
+	s3Client := s3.NewFromConfig(cfg)
+
+	// List and delete all object versions
+	listVersionsInput := &s3.ListObjectVersionsInput{
+		Bucket: aws.String(bucketName),
+	}
+
+	for {
+		listVersionsOutput, err := s3Client.ListObjectVersions(context.TODO(), listVersionsInput)
+		if err != nil {
+			t.Logf("Warning: Could not list object versions: %v", err)
+			break
+		}
+
+		// Delete object versions
+		if len(listVersionsOutput.Versions) > 0 {
+			var objectsToDelete []types.ObjectIdentifier
+			for _, version := range listVersionsOutput.Versions {
+				objectsToDelete = append(objectsToDelete, types.ObjectIdentifier{
+					Key:       version.Key,
+					VersionId: version.VersionId,
+				})
+			}
+
+			deleteInput := &s3.DeleteObjectsInput{
+				Bucket: aws.String(bucketName),
+				Delete: &types.Delete{
+					Objects: objectsToDelete,
+				},
+			}
+
+			_, err := s3Client.DeleteObjects(context.TODO(), deleteInput)
+			if err != nil {
+				t.Logf("Warning: Could not delete object versions: %v", err)
+			} else {
+				t.Logf("Deleted %d object versions", len(objectsToDelete))
+			}
+		}
+
+		// Delete delete markers
+		if len(listVersionsOutput.DeleteMarkers) > 0 {
+			var markersToDelete []types.ObjectIdentifier
+			for _, marker := range listVersionsOutput.DeleteMarkers {
+				markersToDelete = append(markersToDelete, types.ObjectIdentifier{
+					Key:       marker.Key,
+					VersionId: marker.VersionId,
+				})
+			}
+
+			deleteInput := &s3.DeleteObjectsInput{
+				Bucket: aws.String(bucketName),
+				Delete: &types.Delete{
+					Objects: markersToDelete,
+				},
+			}
+
+			_, err := s3Client.DeleteObjects(context.TODO(), deleteInput)
+			if err != nil {
+				t.Logf("Warning: Could not delete delete markers: %v", err)
+			} else {
+				t.Logf("Deleted %d delete markers", len(markersToDelete))
+			}
+		}
+
+		// Check if there are more objects to delete
+		if !*listVersionsOutput.IsTruncated {
+			break
+		}
+		listVersionsInput.KeyMarker = listVersionsOutput.NextKeyMarker
+		listVersionsInput.VersionIdMarker = listVersionsOutput.NextVersionIdMarker
+	}
+
+	t.Logf("S3 bucket %s has been emptied", bucketName)
+}
+
 // Destroy the terraform code
 func destroyTerraform(t *testing.T) {
 	terraform.Destroy(t, opts)
@@ -271,6 +354,8 @@ func verifyIAMPolicyForS3Locking(t *testing.T) {
 // Test the red backend terraform module
 func TestRedBackend(t *testing.T) {
 	defer test_structure.RunTestStage(t, "terraform_destroy", func() {
+		// Empty the bucket before destroying to avoid "bucket not empty" errors
+		emptyS3Bucket(t)
 		destroyTerraform(t)
 	})
 
