@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	awsRegion   = os.Getenv("AWS_REGION")
+	awsRegion   = getAWSRegion()
 	projectName = fmt.Sprintf("red-backend-%s", strings.ToLower(random.UniqueId()))
 	opts        = &terraform.Options{
 		TerraformDir: ".",
@@ -32,6 +32,18 @@ var (
 		},
 	}
 )
+
+// getAWSRegion tries AWS_REGION first, then falls back to AWS_DEFAULT_REGION
+func getAWSRegion() string {
+	if region := os.Getenv("AWS_REGION"); region != "" {
+		return region
+	}
+	if region := os.Getenv("AWS_DEFAULT_REGION"); region != "" {
+		return region
+	}
+	// Default fallback
+	return "us-east-1"
+}
 
 // Empty the S3 bucket before destruction (required for versioned buckets)
 func emptyS3Bucket(t *testing.T) {
