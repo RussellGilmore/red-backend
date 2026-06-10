@@ -25,7 +25,7 @@ var (
 	awsRegion   = getAWSRegion()
 	projectName = fmt.Sprintf("red-backend-%s", strings.ToLower(random.UniqueId()))
 	opts        = &terraform.Options{
-		TerraformDir: ".",
+		TerraformDir: "../examples/complete",
 		Vars: map[string]interface{}{
 			"region":       awsRegion,
 			"project_name": projectName,
@@ -282,6 +282,7 @@ func verifyS3BucketTags(t *testing.T) {
 	assert.Equal(t, "Terraform", tags["Orchestrator"], "Should have Orchestrator tag")
 	assert.Equal(t, "Red-Backend", tags["Artifact"], "Should have Artifact tag")
 	assert.Equal(t, projectName, tags["Project"], "Should have Project tag")
+	assert.Equal(t, "example", tags["Environment"], "Should have caller-supplied Environment tag")
 }
 
 // Test S3 bucket lifecycle configuration using AWS SDK v2
