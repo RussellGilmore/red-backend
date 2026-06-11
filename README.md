@@ -1,8 +1,10 @@
 # Red Backend
 
+## [![Red Backend Module](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml/badge.svg?branch=main)](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml)
+
 **Requirements:**
 
-1. Terraform 1.14.6
+1. Terraform >= 1.15.0
 2. Trivy >= 0.68.2
 
 Trivy can be installed via Homebrew on macOS with the command:
@@ -11,9 +13,33 @@ Trivy can be installed via Homebrew on macOS with the command:
 brew install aquasecurity/trivy/trivy
 ```
 
-## [![Red Backend Module](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml/badge.svg?branch=main)](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml)
+## Security posture
 
-A simple remote backend module for AWS Terraform creations.
+-   All public access blocked; versioning always on
+-   SSE-S3 encryption by default, optional customer-managed KMS via
+    `kms_key_arn` (IAM policy picks up the required KMS permissions
+    automatically)
+-   Generated IAM policy scoped to the single state bucket, with lock-file
+    permissions gated by object tag
+-   Code scanned with Trivy and gitleaks on every commit; integration-tested
+    with Terratest against a live AWS account
+
+## Usage
+
+See [`examples/complete`](./examples/complete) for a working configuration. The
+module does not configure the AWS provider — that belongs to you:
+
+```hcl
+provider "aws" {
+  region = "us-east-1"
+}
+
+module "backend" {
+  source = "RussellGilmore/red-backend/aws"
+
+  project_name = "my-project"
+}
+```
 
 <!-- prettier-ignore-start -->
 <!-- BEGIN_TF_DOCS -->
