@@ -2,6 +2,9 @@
 
 ## [![Red Backend Module](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml/badge.svg?branch=main)](https://github.com/RussellGilmore/red-backend/actions/workflows/module-test.yml)
 
+A minimal, security-first S3 remote backend for Terraform — public access
+blocked, versioned, encrypted, with S3 native state locking (no DynamoDB).
+
 **Requirements:**
 
 1. Terraform >= 1.15.0
