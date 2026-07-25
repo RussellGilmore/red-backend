@@ -27,6 +27,18 @@ brew install aquasecurity/trivy/trivy
 -   Code scanned with Trivy and gitleaks on every commit; integration-tested
     with Terratest against a live AWS account
 
+## Features
+
+-   Creates a versioned, encrypted S3 bucket for Terraform remote state with all
+    public access blocked
+-   Uses S3 native state locking (`use_lockfile`) — no DynamoDB table required
+-   SSE-S3 encryption by default, with optional customer-managed KMS via
+    `kms_key_arn`
+-   Generates a scoped IAM policy for state access, automatically including KMS
+    permissions when a key is supplied
+-   Outputs a ready-to-copy `backend "s3"` configuration block
+-   Configurable tags applied across all resources
+
 ## Usage
 
 See [`examples/complete`](./examples/complete) for a working configuration. The
