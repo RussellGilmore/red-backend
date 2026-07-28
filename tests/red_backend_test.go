@@ -46,8 +46,8 @@ func getAWSRegion() string {
 }
 
 // Empty the S3 bucket before destruction (required for versioned buckets)
-func emptyS3Bucket(t *testing.T) {
-	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
+func emptyS3Bucket(t *testing.T, ctx context.Context) {
+	bucketName := terraform.OutputContext(t, ctx, opts, "red_backend_s3_bucket")
 
 	// Create AWS SDK v2 client
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(awsRegion))
@@ -129,29 +129,29 @@ func emptyS3Bucket(t *testing.T) {
 }
 
 // Destroy the terraform code
-func destroyTerraform(t *testing.T) {
-	terraform.Destroy(t, opts)
+func destroyTerraform(t *testing.T, ctx context.Context) {
+	terraform.DestroyContext(t, ctx, opts)
 }
 
 // Deploy the terraform code
-func deployTerraform(t *testing.T) {
-	_, err := terraform.InitAndApplyE(t, opts)
+func deployTerraform(t *testing.T, ctx context.Context) {
+	_, err := terraform.InitAndApplyContextE(t, ctx, opts)
 	if err != nil {
-		terraform.Apply(t, opts)
+		terraform.ApplyContext(t, ctx, opts)
 	}
 }
 
 // Verify the names of the S3 bucket created by the red backend
-func verifyRedBackendNames(t *testing.T) {
-	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
+func verifyRedBackendNames(t *testing.T, ctx context.Context) {
+	bucketName := terraform.OutputContext(t, ctx, opts, "red_backend_s3_bucket")
 	expectedBucketName := projectName + "-s3"
 
 	assert.Equal(t, expectedBucketName, bucketName, "S3 bucket name should match expected format")
 }
 
 // Verify S3 bucket configuration using available Terratest functions and AWS SDK v2
-func verifyS3BucketConfiguration(t *testing.T) {
-	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
+func verifyS3BucketConfiguration(t *testing.T, ctx context.Context) {
+	bucketName := terraform.OutputContext(t, ctx, opts, "red_backend_s3_bucket")
 
 	// Use Terratest's basic helper function that we know exists
 	terratest_aws.AssertS3BucketExists(t, awsRegion, bucketName)
@@ -189,8 +189,8 @@ func verifyS3BucketConfiguration(t *testing.T) {
 }
 
 // Verify S3 native locking capabilities using AWS SDK v2
-func verifyS3NativeLockingCapabilities(t *testing.T) {
-	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
+func verifyS3NativeLockingCapabilities(t *testing.T, ctx context.Context) {
+	bucketName := terraform.OutputContext(t, ctx, opts, "red_backend_s3_bucket")
 
 	// Create AWS SDK v2 client
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(awsRegion))
@@ -232,9 +232,9 @@ func verifyS3NativeLockingCapabilities(t *testing.T) {
 }
 
 // Verify backend configuration output format
-func verifyBackendConfiguration(t *testing.T) {
+func verifyBackendConfiguration(t *testing.T, ctx context.Context) {
 	// Get the backend configuration output
-	backendConfigMap := terraform.OutputMap(t, opts, "backend_configuration")
+	backendConfigMap := terraform.OutputMapContext(t, ctx, opts, "backend_configuration")
 
 	// Verify required fields exist and have correct values
 	assert.Equal(t, projectName+"-s3", backendConfigMap["bucket"], "Backend config should have correct bucket name")
@@ -253,7 +253,7 @@ func verifyBackendConfiguration(t *testing.T) {
 	assert.Equal(t, "true", backendConfigMap["use_lockfile"], "Backend config should have S3 native locking enabled")
 
 	// Verify the example backend config contains the correct information
-	exampleConfig := terraform.Output(t, opts, "example_backend_config")
+	exampleConfig := terraform.OutputContext(t, ctx, opts, "example_backend_config")
 	assert.Contains(t, exampleConfig, projectName+"-s3", "Example config should contain correct bucket name")
 
 	// Handle masked region in CI/CD environments
@@ -272,8 +272,8 @@ func verifyBackendConfiguration(t *testing.T) {
 }
 
 // Verify S3 bucket tags using Terratest
-func verifyS3BucketTags(t *testing.T) {
-	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
+func verifyS3BucketTags(t *testing.T, ctx context.Context) {
+	bucketName := terraform.OutputContext(t, ctx, opts, "red_backend_s3_bucket")
 
 	// Get bucket tags using Terratest (this function exists)
 	tags := terratest_aws.GetS3BucketTags(t, awsRegion, bucketName)
@@ -282,12 +282,14 @@ func verifyS3BucketTags(t *testing.T) {
 	assert.Equal(t, "Terraform", tags["Orchestrator"], "Should have Orchestrator tag")
 	assert.Equal(t, "Red-Backend", tags["Artifact"], "Should have Artifact tag")
 	assert.Equal(t, projectName, tags["Project"], "Should have Project tag")
+
+	// additional_tags from the example should be merged in
 	assert.Equal(t, "example", tags["Environment"], "Should have caller-supplied Environment tag")
 }
 
 // Test S3 bucket lifecycle configuration using AWS SDK v2
-func verifyS3BucketLifecycle(t *testing.T) {
-	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
+func verifyS3BucketLifecycle(t *testing.T, ctx context.Context) {
+	bucketName := terraform.OutputContext(t, ctx, opts, "red_backend_s3_bucket")
 
 	// Create AWS SDK v2 client
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(awsRegion))
@@ -309,8 +311,8 @@ func verifyS3BucketLifecycle(t *testing.T) {
 }
 
 // Test IAM policy permissions for S3 native locking using AWS SDK v2
-func verifyIAMPolicyForS3Locking(t *testing.T) {
-	bucketName := terraform.Output(t, opts, "red_backend_s3_bucket")
+func verifyIAMPolicyForS3Locking(t *testing.T, ctx context.Context) {
+	bucketName := terraform.OutputContext(t, ctx, opts, "red_backend_s3_bucket")
 
 	// Create AWS SDK v2 client
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(awsRegion))
@@ -384,41 +386,43 @@ func verifyIAMPolicyForS3Locking(t *testing.T) {
 
 // Test the red backend terraform module
 func TestRedBackend(t *testing.T) {
+	ctx := t.Context()
+
 	defer test_structure.RunTestStage(t, "terraform_destroy", func() {
 		// Empty the bucket before destroying to avoid "bucket not empty" errors
-		emptyS3Bucket(t)
-		destroyTerraform(t)
+		emptyS3Bucket(t, ctx)
+		destroyTerraform(t, ctx)
 	})
 
 	test_structure.RunTestStage(t, "terraform_init_and_apply", func() {
-		deployTerraform(t)
+		deployTerraform(t, ctx)
 	})
 
 	test_structure.RunTestStage(t, "validate_red_backend_names", func() {
-		verifyRedBackendNames(t)
+		verifyRedBackendNames(t, ctx)
 	})
 
 	test_structure.RunTestStage(t, "validate_s3_bucket_configuration", func() {
-		verifyS3BucketConfiguration(t)
+		verifyS3BucketConfiguration(t, ctx)
 	})
 
 	test_structure.RunTestStage(t, "validate_s3_native_locking_capabilities", func() {
-		verifyS3NativeLockingCapabilities(t)
+		verifyS3NativeLockingCapabilities(t, ctx)
 	})
 
 	test_structure.RunTestStage(t, "validate_backend_configuration_output", func() {
-		verifyBackendConfiguration(t)
+		verifyBackendConfiguration(t, ctx)
 	})
 
 	test_structure.RunTestStage(t, "validate_s3_bucket_tags", func() {
-		verifyS3BucketTags(t)
+		verifyS3BucketTags(t, ctx)
 	})
 
 	test_structure.RunTestStage(t, "validate_s3_bucket_lifecycle", func() {
-		verifyS3BucketLifecycle(t)
+		verifyS3BucketLifecycle(t, ctx)
 	})
 
 	test_structure.RunTestStage(t, "validate_iam_policy_for_s3_locking", func() {
-		verifyIAMPolicyForS3Locking(t)
+		verifyIAMPolicyForS3Locking(t, ctx)
 	})
 }
